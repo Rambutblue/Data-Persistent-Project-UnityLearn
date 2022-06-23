@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public GameObject HighscoreText;
+    public GameObject AllTimeHighscoreText;
+    public GameObject playerNameDisplay;
     
     private bool m_Started = false;
     private int m_Points;
@@ -36,6 +40,18 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        if (MenuManager.instance.maxPoints != 0)
+        {
+            if (MenuManager.instance.bestPlayerName != "")
+            {
+                AllTimeHighscoreText.GetComponent<Text>().text = "Best score: " + MenuManager.instance.bestPlayerName + " : " + MenuManager.instance.maxPoints;
+            }
+            else
+            {
+                AllTimeHighscoreText.GetComponent<Text>().text = "Best score: Anonimous : " + MenuManager.instance.maxPoints;
+            }
+        }
+        playerNameDisplay.GetComponent<TextMeshProUGUI>().text = "Currently playing as: " + MenuManager.instance.playerName;
     }
 
     private void Update()
@@ -72,5 +88,28 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        HighscoreText.GetComponent<TextMeshProUGUI>().text = "Highscore: " + m_Points + "!";
+        HighscoreText.SetActive(true);
+        if(m_Points > MenuManager.instance.maxPoints)
+        {
+            MenuManager.instance.maxPoints = m_Points;
+            if (MenuManager.instance.playerName != "")
+            {
+                MenuManager.instance.bestPlayerName = MenuManager.instance.playerName;
+                AllTimeHighscoreText.GetComponent<Text>().text = "Best score: " + MenuManager.instance.playerName + " : " + MenuManager.instance.maxPoints;
+                
+            }
+            else
+            {
+                AllTimeHighscoreText.GetComponent<Text>().text = "Best score: Anonimous : " + MenuManager.instance.maxPoints;
+            }
+        }
+        MenuManager.instance.SaveData();
+
+    }
+    public void Exit()
+    {
+        SceneManager.LoadScene(0);
+
     }
 }
